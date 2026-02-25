@@ -5,7 +5,7 @@ namespace CustomerManagementAPI.DAL
 {
     /// <summary>
     /// Database context for Customer Management application.
-    /// Manages Customer, Product, Order, and OrderItem entities.
+    /// Manages Customer, Product, Order, OrderItem, and User entities.
     /// </summary>
     public class ApplicationDbContext : DbContext
     {
@@ -33,6 +33,11 @@ namespace CustomerManagementAPI.DAL
         /// OrderItems table (detail in master-detail relationship)
         /// </summary>
         public DbSet<OrderItem> OrderItems { get; set; }
+
+        /// <summary>
+        /// Users table (for authentication)
+        /// </summary>
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -99,6 +104,19 @@ namespace CustomerManagementAPI.DAL
                     .WithMany()
                     .HasForeignKey(e => e.ProductId)
                     .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete - integrity check
+            });
+
+            // Configure User entity (for authentication)
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Username).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Email).HasMaxLength(200);
+                entity.Property(e => e.FullName).HasMaxLength(100);
+                
+                // Unique index on Username for fast lookup and uniqueness constraint
+                entity.HasIndex(e => e.Username).IsUnique();
             });
 
             // Seed initial Customer data
@@ -195,6 +213,32 @@ namespace CustomerManagementAPI.DAL
                     Quantity = 2,
                     UnitPrice = 29.99m,
                     Subtotal = 59.98m
+                }
+            );
+
+            // Seed initial User data for authentication
+            // Passwords are hashed using BCrypt with 10 salt rounds
+            // admin/admin123 and user/user123
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    Username = "admin",
+                    // BCrypt hash for "admin123"
+                    PasswordHash = "$2a$10$rQEYn6/U5rvBl7yx5gZ5/.qP.tMI8I9E7tTJ.H5KH.aZvGx6Z5OPK",
+                    Email = "admin@example.com",
+                    FullName = "System Administrator",
+                    CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                },
+                new User
+                {
+                    Id = 2,
+                    Username = "user",
+                    // BCrypt hash for "user123"
+                    PasswordHash = "$2a$10$rP8BV8Z5F5YqG2YB6S5xOeQxvN5M8M5M5O5O5N5N5M5M5M5M5M5M",
+                    Email = "user@example.com",
+                    FullName = "Regular User",
+                    CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                 }
             );
         }

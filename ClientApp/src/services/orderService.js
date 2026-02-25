@@ -1,11 +1,35 @@
 import axios from 'axios';
+import authService from './authService';
 
 // Base API URL
 const API_BASE_URL = 'http://localhost:5000/api';
 
 /**
+ * Get authorization headers with JWT token
+ * @returns {Object} headers object
+ */
+const getAuthHeaders = () => {
+  const token = authService.getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+/**
+ * Handle API errors including 401 Unauthorized
+ * @param {Error} error 
+ */
+const handleApiError = (error) => {
+  if (error.response?.status === 401) {
+    // Token expired or invalid - logout and redirect
+    authService.logout();
+    window.location.href = '/';
+  }
+  throw error;
+};
+
+/**
  * Order API Service
  * Handles all API calls related to order operations with master-detail functionality
+ * All requests include JWT authentication token
  */
 class OrderService {
   /**
@@ -22,11 +46,13 @@ class OrderService {
       if (filters.dateTo) params.append('dateTo', filters.dateTo);
       if (filters.customerId) params.append('customerId', filters.customerId);
 
-      const response = await axios.get(`${API_BASE_URL}/orders?${params.toString()}`);
+      const response = await axios.get(`${API_BASE_URL}/orders?${params.toString()}`, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching orders:', error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -37,11 +63,13 @@ class OrderService {
    */
   async getOrderById(id) {
     try {
-      const response = await axios.get(`${API_BASE_URL}/orders/${id}`);
+      const response = await axios.get(`${API_BASE_URL}/orders/${id}`, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error(`Error fetching order ${id}:`, error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -52,11 +80,13 @@ class OrderService {
    */
   async createOrder(orderData) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/orders`, orderData);
+      const response = await axios.post(`${API_BASE_URL}/orders`, orderData, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error('Error creating order:', error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -68,11 +98,13 @@ class OrderService {
    */
   async updateOrder(id, orderData) {
     try {
-      const response = await axios.put(`${API_BASE_URL}/orders/${id}`, orderData);
+      const response = await axios.put(`${API_BASE_URL}/orders/${id}`, orderData, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error(`Error updating order ${id}:`, error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -83,11 +115,13 @@ class OrderService {
    */
   async deleteOrder(id) {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/orders/${id}`);
+      const response = await axios.delete(`${API_BASE_URL}/orders/${id}`, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error(`Error deleting order ${id}:`, error);
-      throw error;
+      handleApiError(error);
     }
   }
 }

@@ -1,5 +1,6 @@
 using CustomerManagementAPI.BLL.DTOs;
 using CustomerManagementAPI.BLL.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerManagementAPI.Controllers
@@ -7,9 +8,11 @@ namespace CustomerManagementAPI.Controllers
     /// <summary>
     /// API Controller for Order management operations.
     /// Provides endpoints for master-detail order operations.
+    /// Requires authentication to access all endpoints.
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;

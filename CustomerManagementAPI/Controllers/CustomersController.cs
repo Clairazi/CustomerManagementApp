@@ -1,14 +1,17 @@
 using CustomerManagementAPI.BLL.DTOs;
 using CustomerManagementAPI.BLL.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerManagementAPI.Controllers
 {
     /// <summary>
     /// API Controller for Customer management operations
+    /// Requires authentication to access all endpoints
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerService _customerService;

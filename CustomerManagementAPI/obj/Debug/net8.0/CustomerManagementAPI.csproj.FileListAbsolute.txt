@@ -139,3 +139,5 @@ C:\Users\reziy\OneDrive\Desktop\customer_management_app\CustomerManagementAPI\ob
 C:\Users\reziy\OneDrive\Desktop\customer_management_app\CustomerManagementAPI\obj\Debug\net8.0\CustomerManagementAPI.pdb
 C:\Users\reziy\OneDrive\Desktop\customer_management_app\CustomerManagementAPI\obj\Debug\net8.0\CustomerManagementAPI.genruntimeconfig.cache
 C:\Users\reziy\OneDrive\Desktop\customer_management_app\CustomerManagementAPI\obj\Debug\net8.0\ref\CustomerManagementAPI.dll
+C:\Users\reziy\OneDrive\Desktop\customer_management_app\CustomerManagementAPI\bin\Debug\net8.0\BCrypt.Net-Next.dll
+C:\Users\reziy\OneDrive\Desktop\customer_management_app\CustomerManagementAPI\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

@@ -1,11 +1,35 @@
 import axios from 'axios';
+import authService from './authService';
 
 // Base API URL
 const API_BASE_URL = 'http://localhost:5000/api';
 
 /**
+ * Get authorization headers with JWT token
+ * @returns {Object} headers object
+ */
+const getAuthHeaders = () => {
+  const token = authService.getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+/**
+ * Handle API errors including 401 Unauthorized
+ * @param {Error} error 
+ */
+const handleApiError = (error) => {
+  if (error.response?.status === 401) {
+    // Token expired or invalid - logout and redirect
+    authService.logout();
+    window.location.href = '/';
+  }
+  throw error;
+};
+
+/**
  * Product API Service
  * Handles all API calls related to product operations
+ * All requests include JWT authentication token
  */
 class ProductService {
   /**
@@ -19,11 +43,13 @@ class ProductService {
       
       if (filters.name) params.append('name', filters.name);
 
-      const response = await axios.get(`${API_BASE_URL}/products?${params.toString()}`);
+      const response = await axios.get(`${API_BASE_URL}/products?${params.toString()}`, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching products:', error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -34,11 +60,13 @@ class ProductService {
    */
   async getProductById(id) {
     try {
-      const response = await axios.get(`${API_BASE_URL}/products/${id}`);
+      const response = await axios.get(`${API_BASE_URL}/products/${id}`, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error(`Error fetching product ${id}:`, error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -49,11 +77,13 @@ class ProductService {
    */
   async createProduct(productData) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/products`, productData);
+      const response = await axios.post(`${API_BASE_URL}/products`, productData, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error('Error creating product:', error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -65,11 +95,13 @@ class ProductService {
    */
   async updateProduct(id, productData) {
     try {
-      const response = await axios.put(`${API_BASE_URL}/products/${id}`, productData);
+      const response = await axios.put(`${API_BASE_URL}/products/${id}`, productData, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error(`Error updating product ${id}:`, error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -80,11 +112,13 @@ class ProductService {
    */
   async deleteProduct(id) {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/products/${id}`);
+      const response = await axios.delete(`${API_BASE_URL}/products/${id}`, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error(`Error deleting product ${id}:`, error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -100,6 +134,7 @@ class ProductService {
       if (filters.name) params.append('name', filters.name);
 
       const response = await axios.get(`${API_BASE_URL}/products/export?${params.toString()}`, {
+        headers: getAuthHeaders(),
         responseType: 'blob'
       });
       
@@ -115,7 +150,7 @@ class ProductService {
       return response.data;
     } catch (error) {
       console.error('Error exporting products:', error);
-      throw error;
+      handleApiError(error);
     }
   }
 }

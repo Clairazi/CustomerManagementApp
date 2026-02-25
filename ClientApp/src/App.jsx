@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Container, Navbar } from 'react-bootstrap';
+import { Container, Navbar, Spinner } from 'react-bootstrap';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import CustomerList from './components/CustomerList';
 import CustomerForm from './components/CustomerForm';
 import ProductList from './components/ProductList';
@@ -7,14 +8,21 @@ import ProductForm from './components/ProductForm';
 import OrderList from './components/OrderList';
 import OrderForm from './components/OrderForm';
 import Navigation from './components/Navigation';
+import Login from './components/Login';
+import Register from './components/Register';
 import './App.css';
 
 /**
- * Main App Component
- * Manages the overall application state and navigation
- * Supports Customers, Products, and Orders (with master-detail functionality)
+ * Main Application Content
+ * Handles the main application logic including navigation and CRUD operations
+ * Protected by authentication - only visible when logged in
  */
-function App() {
+function AppContent() {
+  const { isAuthenticated, loading, user, logout } = useAuth();
+  
+  // Auth view state (login or register)
+  const [authView, setAuthView] = useState('login');
+
   // Module navigation state (customers, products, or orders)
   const [currentModule, setCurrentModule] = useState('customers');
   
@@ -32,6 +40,29 @@ function App() {
   const [orderView, setOrderView] = useState('list');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderRefreshTrigger, setOrderRefreshTrigger] = useState(0);
+
+  // Show loading spinner while checking auth status
+  if (loading) {
+    return (
+      <div className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
+        <Spinner animation="border" variant="primary" />
+        <span className="ms-2">Loading...</span>
+      </div>
+    );
+  }
+
+  // Show login/register if not authenticated
+  if (!isAuthenticated) {
+    if (authView === 'register') {
+      return (
+        <Register 
+          onLoginClick={() => setAuthView('login')}
+          onSuccess={() => setAuthView('login')}
+        />
+      );
+    }
+    return <Login onRegisterClick={() => setAuthView('register')} />;
+  }
 
   /**
    * Handle module change (customers/products/orders)
@@ -202,6 +233,20 @@ function App() {
             <i className="bi bi-building me-2"></i>
             Customer, Product & Order Management System
           </Navbar.Brand>
+          <Navbar.Toggle aria-controls="navbar-nav" />
+          <Navbar.Collapse id="navbar-nav" className="justify-content-end">
+            <Navbar.Text className="me-3">
+              <i className="bi bi-person-circle me-1"></i>
+              Welcome, <strong>{user?.fullName || user?.username || 'User'}</strong>
+            </Navbar.Text>
+            <button 
+              className="btn btn-outline-light btn-sm" 
+              onClick={logout}
+            >
+              <i className="bi bi-box-arrow-right me-1"></i>
+              Logout
+            </button>
+          </Navbar.Collapse>
         </Container>
       </Navbar>
 
@@ -209,6 +254,8 @@ function App() {
       <Navigation 
         currentModule={currentModule}
         onModuleChange={handleModuleChange}
+        user={user}
+        onLogout={logout}
       />
 
       {/* Main Content */}
@@ -225,6 +272,18 @@ function App() {
         </Container>
       </footer>
     </div>
+  );
+}
+
+/**
+ * Main App Component
+ * Wraps the application with AuthProvider for authentication context
+ */
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

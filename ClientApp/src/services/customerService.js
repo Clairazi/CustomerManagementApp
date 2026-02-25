@@ -1,11 +1,35 @@
 import axios from 'axios';
+import authService from './authService';
 
 // Base API URL
 const API_BASE_URL = 'http://localhost:5000/api';
 
 /**
+ * Get authorization headers with JWT token
+ * @returns {Object} headers object
+ */
+const getAuthHeaders = () => {
+  const token = authService.getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+/**
+ * Handle API errors including 401 Unauthorized
+ * @param {Error} error 
+ */
+const handleApiError = (error) => {
+  if (error.response?.status === 401) {
+    // Token expired or invalid - logout and redirect
+    authService.logout();
+    window.location.href = '/';
+  }
+  throw error;
+};
+
+/**
  * Customer API Service
  * Handles all API calls related to customer operations
+ * All requests include JWT authentication token
  */
 class CustomerService {
   /**
@@ -22,11 +46,13 @@ class CustomerService {
       if (filters.email) params.append('email', filters.email);
       if (filters.phoneNumber) params.append('phoneNumber', filters.phoneNumber);
 
-      const response = await axios.get(`${API_BASE_URL}/customers?${params.toString()}`);
+      const response = await axios.get(`${API_BASE_URL}/customers?${params.toString()}`, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching customers:', error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -37,11 +63,13 @@ class CustomerService {
    */
   async getCustomerById(id) {
     try {
-      const response = await axios.get(`${API_BASE_URL}/customers/${id}`);
+      const response = await axios.get(`${API_BASE_URL}/customers/${id}`, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error(`Error fetching customer ${id}:`, error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -52,11 +80,13 @@ class CustomerService {
    */
   async createCustomer(customerData) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/customers`, customerData);
+      const response = await axios.post(`${API_BASE_URL}/customers`, customerData, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error('Error creating customer:', error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -68,11 +98,13 @@ class CustomerService {
    */
   async updateCustomer(id, customerData) {
     try {
-      const response = await axios.put(`${API_BASE_URL}/customers/${id}`, customerData);
+      const response = await axios.put(`${API_BASE_URL}/customers/${id}`, customerData, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error(`Error updating customer ${id}:`, error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -83,11 +115,13 @@ class CustomerService {
    */
   async deleteCustomer(id) {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/customers/${id}`);
+      const response = await axios.delete(`${API_BASE_URL}/customers/${id}`, {
+        headers: getAuthHeaders()
+      });
       return response.data;
     } catch (error) {
       console.error(`Error deleting customer ${id}:`, error);
-      throw error;
+      handleApiError(error);
     }
   }
 
@@ -106,6 +140,7 @@ class CustomerService {
       if (filters.phoneNumber) params.append('phoneNumber', filters.phoneNumber);
 
       const response = await axios.get(`${API_BASE_URL}/customers/export?${params.toString()}`, {
+        headers: getAuthHeaders(),
         responseType: 'blob'
       });
       
@@ -121,7 +156,7 @@ class CustomerService {
       return response.data;
     } catch (error) {
       console.error('Error exporting customers:', error);
-      throw error;
+      handleApiError(error);
     }
   }
 }
