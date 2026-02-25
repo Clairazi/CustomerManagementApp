@@ -144,5 +144,22 @@ namespace CustomerManagementAPI.DAL.Repositories
         {
             return await _context.Products.AnyAsync(p => p.Id == id);
         }
+
+        /// <summary>
+        /// Check if a product has any orders (for referential integrity check)
+        /// Products cannot be deleted if they are used in orders
+        /// </summary>
+        public async Task<bool> HasOrdersAsync(int productId)
+        {
+            try
+            {
+                return await _context.OrderItems.AnyAsync(oi => oi.ProductId == productId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error checking orders for product ID {productId}");
+                throw;
+            }
+        }
     }
 }

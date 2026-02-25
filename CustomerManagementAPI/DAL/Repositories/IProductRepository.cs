@@ -41,5 +41,10 @@ namespace CustomerManagementAPI.DAL.Repositories
         /// Check if a product exists
         /// </summary>
         Task<bool> ExistsAsync(int id);
+
+        /// <summary>
+        /// Check if a product has any orders (for referential integrity)
+        /// </summary>
+        Task<bool> HasOrdersAsync(int productId);
     }
 }

@@ -8,52 +8,69 @@ import {
   Col, 
   Alert, 
   Spinner,
-  Modal 
+  Modal,
+  Badge
 } from 'react-bootstrap';
+import orderService from '../services/orderService';
 import customerService from '../services/customerService';
 
 /**
- * CustomerList Component
- * Displays a list of customers with filtering, search, and action buttons
+ * OrderList Component
+ * Displays a list of orders with filtering, search, and action buttons.
+ * Shows Order ID, Customer Name, Order Date, Total Amount, and Status.
  */
-function CustomerList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
+function OrderList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
   // State management
+  const [orders, setOrders] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [customerToDelete, setCustomerToDelete] = useState(null);
+  const [orderToDelete, setOrderToDelete] = useState(null);
 
   // Filter state
   const [filters, setFilters] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: ''
+    orderId: '',
+    dateFrom: '',
+    dateTo: '',
+    customerId: ''
   });
 
   /**
-   * Load customers from API
+   * Load orders from API
    */
-  const loadCustomers = async () => {
+  const loadOrders = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await customerService.getAllCustomers(filters);
-      setCustomers(data);
+      const data = await orderService.getAllOrders(filters);
+      setOrders(data);
     } catch (err) {
-      setError('Failed to load customers. Please try again.');
-      console.error('Error loading customers:', err);
+      setError('Failed to load orders. Please try again.');
+      console.error('Error loading orders:', err);
     } finally {
       setLoading(false);
     }
   };
 
   /**
-   * Effect hook to load customers on component mount and when filters change
+   * Load customers for the filter dropdown
+   */
+  const loadCustomers = async () => {
+    try {
+      const data = await customerService.getAllCustomers();
+      setCustomers(data);
+    } catch (err) {
+      console.error('Error loading customers for filter:', err);
+    }
+  };
+
+  /**
+   * Effect hook to load data on component mount and when refreshTrigger changes
    */
   useEffect(() => {
+    loadOrders();
     loadCustomers();
   }, [refreshTrigger]);
 
@@ -72,7 +89,7 @@ function CustomerList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
    * Handle search button click
    */
   const handleSearch = () => {
-    loadCustomers();
+    loadOrders();
   };
 
   /**
@@ -80,64 +97,45 @@ function CustomerList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
    */
   const handleClearFilters = () => {
     setFilters({
-      firstName: '',
-      lastName: '',
-      email: '',
-      phoneNumber: ''
+      orderId: '',
+      dateFrom: '',
+      dateTo: '',
+      customerId: ''
     });
-    // Reload customers without filters
+    // Reload orders without filters
     setTimeout(() => {
-      customerService.getAllCustomers({})
-        .then(data => setCustomers(data))
-        .catch(err => setError('Failed to load customers'));
+      orderService.getAllOrders({})
+        .then(data => setOrders(data))
+        .catch(err => setError('Failed to load orders'));
     }, 100);
-  };
-
-  /**
-   * Handle export to Excel
-   */
-  const handleExport = async () => {
-    try {
-      setError(null);
-      await customerService.exportCustomersToExcel(filters);
-      setSuccess('Customers exported successfully!');
-      setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
-      setError('Failed to export customers. Please try again.');
-      console.error('Error exporting customers:', err);
-    }
   };
 
   /**
    * Show delete confirmation modal
    */
-  const showDeleteConfirmation = (customer) => {
-    setCustomerToDelete(customer);
+  const showDeleteConfirmation = (order) => {
+    setOrderToDelete(order);
     setShowDeleteModal(true);
   };
 
   /**
-   * Handle delete customer
-   * Shows specific error message if customer has orders (referential integrity)
+   * Handle delete order
    */
   const handleDelete = async () => {
-    if (!customerToDelete) return;
+    if (!orderToDelete) return;
 
     try {
       setError(null);
-      await customerService.deleteCustomer(customerToDelete.id);
-      setSuccess(`Customer "${customerToDelete.firstName} ${customerToDelete.lastName}" deleted successfully!`);
+      await orderService.deleteOrder(orderToDelete.id);
+      setSuccess(`Order #${orderToDelete.id} deleted successfully!`);
       setTimeout(() => setSuccess(null), 3000);
       setShowDeleteModal(false);
-      setCustomerToDelete(null);
+      setOrderToDelete(null);
       onDeleteSuccess();
     } catch (err) {
-      // Handle referential integrity error (customer has orders)
-      const errorMessage = err.response?.data?.message || 'Failed to delete customer. Please try again.';
-      setError(errorMessage);
-      console.error('Error deleting customer:', err);
+      setError('Failed to delete order. Please try again.');
+      console.error('Error deleting order:', err);
       setShowDeleteModal(false);
-      setCustomerToDelete(null);
     }
   };
 
@@ -146,12 +144,46 @@ function CustomerList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
    */
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
-    setCustomerToDelete(null);
+    setOrderToDelete(null);
+  };
+
+  /**
+   * Format price for display
+   */
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(price);
+  };
+
+  /**
+   * Format date for display
+   */
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  /**
+   * Get status badge variant
+   */
+  const getStatusBadge = (status) => {
+    const variants = {
+      'Pending': 'warning',
+      'Processing': 'info',
+      'Completed': 'success',
+      'Cancelled': 'danger'
+    };
+    return variants[status] || 'secondary';
   };
 
   return (
     <div>
-      <h2 className="mb-4">Customer List</h2>
+      <h2 className="mb-4">Order List</h2>
 
       {/* Success Alert */}
       {success && (
@@ -177,50 +209,53 @@ function CustomerList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
             <Row>
               <Col md={3}>
                 <Form.Group className="mb-3">
-                  <Form.Label>First Name</Form.Label>
+                  <Form.Label>Order ID</Form.Label>
                   <Form.Control
-                    type="text"
-                    name="firstName"
-                    placeholder="Enter first name"
-                    value={filters.firstName}
+                    type="number"
+                    name="orderId"
+                    placeholder="Enter order ID"
+                    value={filters.orderId}
                     onChange={handleFilterChange}
                   />
                 </Form.Group>
               </Col>
               <Col md={3}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Last Name</Form.Label>
+                  <Form.Label>Date From</Form.Label>
                   <Form.Control
-                    type="text"
-                    name="lastName"
-                    placeholder="Enter last name"
-                    value={filters.lastName}
+                    type="date"
+                    name="dateFrom"
+                    value={filters.dateFrom}
                     onChange={handleFilterChange}
                   />
                 </Form.Group>
               </Col>
               <Col md={3}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Email</Form.Label>
+                  <Form.Label>Date To</Form.Label>
                   <Form.Control
-                    type="text"
-                    name="email"
-                    placeholder="Enter email"
-                    value={filters.email}
+                    type="date"
+                    name="dateTo"
+                    value={filters.dateTo}
                     onChange={handleFilterChange}
                   />
                 </Form.Group>
               </Col>
               <Col md={3}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Phone Number</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="phoneNumber"
-                    placeholder="Enter phone number"
-                    value={filters.phoneNumber}
+                  <Form.Label>Customer</Form.Label>
+                  <Form.Select
+                    name="customerId"
+                    value={filters.customerId}
                     onChange={handleFilterChange}
-                  />
+                  >
+                    <option value="">All Customers</option>
+                    {customers.map(customer => (
+                      <option key={customer.id} value={customer.id}>
+                        {customer.firstName} {customer.lastName}
+                      </option>
+                    ))}
+                  </Form.Select>
                 </Form.Group>
               </Col>
             </Row>
@@ -242,15 +277,11 @@ function CustomerList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
       <div className="action-buttons d-flex gap-2 mb-3">
         <Button variant="success" onClick={onAddNew}>
           <i className="bi bi-plus-circle me-2"></i>
-          Add New Customer
-        </Button>
-        <Button variant="info" onClick={handleExport}>
-          <i className="bi bi-file-excel me-2"></i>
-          Export to Excel
+          Add New Order
         </Button>
       </div>
 
-      {/* Customer Table */}
+      {/* Order Table */}
       <Card>
         <Card.Body>
           {loading ? (
@@ -259,39 +290,45 @@ function CustomerList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
                 <span className="visually-hidden">Loading...</span>
               </Spinner>
             </div>
-          ) : customers.length === 0 ? (
+          ) : orders.length === 0 ? (
             <Alert variant="info">
-              No customers found. {filters.firstName || filters.lastName || filters.email || filters.phoneNumber 
+              No orders found. {filters.orderId || filters.dateFrom || filters.dateTo || filters.customerId 
                 ? 'Try adjusting your filters.' 
-                : 'Click "Add New Customer" to get started.'}
+                : 'Click "Add New Order" to get started.'}
             </Alert>
           ) : (
             <div className="table-responsive">
               <Table striped bordered hover>
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Phone Number</th>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Order Date</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Items</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {customers.map((customer) => (
-                    <tr key={customer.id}>
-                      <td>{customer.id}</td>
-                      <td>{customer.firstName}</td>
-                      <td>{customer.lastName}</td>
-                      <td>{customer.email || '-'}</td>
-                      <td>{customer.phoneNumber || '-'}</td>
+                  {orders.map((order) => (
+                    <tr key={order.id}>
+                      <td>#{order.id}</td>
+                      <td>{order.customerName}</td>
+                      <td>{formatDate(order.orderDate)}</td>
+                      <td>{formatPrice(order.totalAmount)}</td>
+                      <td>
+                        <Badge bg={getStatusBadge(order.status)}>
+                          {order.status}
+                        </Badge>
+                      </td>
+                      <td>{order.orderItems?.length || 0}</td>
                       <td>
                         <Button
                           variant="warning"
                           size="sm"
                           className="btn-action"
-                          onClick={() => onEdit(customer)}
+                          onClick={() => onEdit(order)}
                         >
                           <i className="bi bi-pencil me-1"></i>
                           Edit
@@ -299,7 +336,7 @@ function CustomerList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
                         <Button
                           variant="danger"
                           size="sm"
-                          onClick={() => showDeleteConfirmation(customer)}
+                          onClick={() => showDeleteConfirmation(order)}
                         >
                           <i className="bi bi-trash me-1"></i>
                           Delete
@@ -310,7 +347,7 @@ function CustomerList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
                 </tbody>
               </Table>
               <div className="text-muted">
-                Total Customers: {customers.length}
+                Total Orders: {orders.length}
               </div>
             </div>
           )}
@@ -323,11 +360,11 @@ function CustomerList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
           <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete customer{' '}
-          <strong>
-            {customerToDelete?.firstName} {customerToDelete?.lastName}
-          </strong>
-          ? This action cannot be undone.
+          Are you sure you want to delete order{' '}
+          <strong>#{orderToDelete?.id}</strong> for customer{' '}
+          <strong>{orderToDelete?.customerName}</strong>?
+          <br /><br />
+          <small className="text-muted">This will also delete all order items. This action cannot be undone.</small>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseDeleteModal}>
@@ -342,4 +379,4 @@ function CustomerList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
   );
 }
 
-export default CustomerList;
+export default OrderList;

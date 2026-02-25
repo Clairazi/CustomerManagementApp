@@ -121,12 +121,20 @@ namespace CustomerManagementAPI.BLL.Services
         }
 
         /// <summary>
-        /// Delete a product
+        /// Delete a product with referential integrity check.
+        /// Products cannot be deleted if they are used in orders.
         /// </summary>
         public async Task<bool> DeleteProductAsync(int id)
         {
             try
             {
+                // Check referential integrity - product cannot be deleted if it's used in orders
+                var hasOrders = await _productRepository.HasOrdersAsync(id);
+                if (hasOrders)
+                {
+                    throw new InvalidOperationException($"Cannot delete product with ID {id}. Product is used in existing orders. Please delete the orders first.");
+                }
+
                 var result = await _productRepository.DeleteAsync(id);
                 if (result)
                 {
@@ -134,9 +142,29 @@ namespace CustomerManagementAPI.BLL.Services
                 }
                 return result;
             }
+            catch (InvalidOperationException)
+            {
+                throw; // Re-throw integrity violation
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in DeleteProductAsync for ID {id}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Check if a product has any orders (for referential integrity)
+        /// </summary>
+        public async Task<bool> HasOrdersAsync(int productId)
+        {
+            try
+            {
+                return await _productRepository.HasOrdersAsync(productId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error checking orders for product ID {productId}");
                 throw;
             }
         }

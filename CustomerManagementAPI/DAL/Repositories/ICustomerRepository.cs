@@ -2,6 +2,9 @@ using CustomerManagementAPI.DAL.Entities;
 
 namespace CustomerManagementAPI.DAL.Repositories
 {
+    /// <summary>
+    /// Interface for Customer repository operations
+    /// </summary>
     public interface ICustomerRepository
     {
         /// <summary>
@@ -34,5 +37,10 @@ namespace CustomerManagementAPI.DAL.Repositories
         /// Check if a customer exists
         /// </summary>
         Task<bool> CustomerExistsAsync(int id);
+
+        /// <summary>
+        /// Check if a customer has any orders (for referential integrity)
+        /// </summary>
+        Task<bool> HasOrdersAsync(int customerId);
     }
 }

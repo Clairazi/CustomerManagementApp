@@ -112,6 +112,7 @@ function ProductList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
 
   /**
    * Handle delete product
+   * Shows specific error message if product has orders (referential integrity)
    */
   const handleDelete = async () => {
     if (!productToDelete) return;
@@ -125,9 +126,12 @@ function ProductList({ onAddNew, onEdit, onDeleteSuccess, refreshTrigger }) {
       setProductToDelete(null);
       onDeleteSuccess();
     } catch (err) {
-      setError('Failed to delete product. Please try again.');
+      // Handle referential integrity error (product is used in orders)
+      const errorMessage = err.response?.data?.message || 'Failed to delete product. Please try again.';
+      setError(errorMessage);
       console.error('Error deleting product:', err);
       setShowDeleteModal(false);
+      setProductToDelete(null);
     }
   };
 

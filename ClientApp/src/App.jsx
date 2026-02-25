@@ -4,15 +4,18 @@ import CustomerList from './components/CustomerList';
 import CustomerForm from './components/CustomerForm';
 import ProductList from './components/ProductList';
 import ProductForm from './components/ProductForm';
+import OrderList from './components/OrderList';
+import OrderForm from './components/OrderForm';
 import Navigation from './components/Navigation';
 import './App.css';
 
 /**
  * Main App Component
  * Manages the overall application state and navigation
+ * Supports Customers, Products, and Orders (with master-detail functionality)
  */
 function App() {
-  // Module navigation state (customers or products)
+  // Module navigation state (customers, products, or orders)
   const [currentModule, setCurrentModule] = useState('customers');
   
   // Customer state management
@@ -25,8 +28,13 @@ function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productRefreshTrigger, setProductRefreshTrigger] = useState(0);
 
+  // Order state management (master-detail)
+  const [orderView, setOrderView] = useState('list');
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderRefreshTrigger, setOrderRefreshTrigger] = useState(0);
+
   /**
-   * Handle module change (customers/products)
+   * Handle module change (customers/products/orders)
    */
   const handleModuleChange = (module) => {
     setCurrentModule(module);
@@ -34,9 +42,12 @@ function App() {
     if (module === 'customers') {
       setCustomerView('list');
       setSelectedCustomer(null);
-    } else {
+    } else if (module === 'products') {
       setProductView('list');
       setSelectedProduct(null);
+    } else if (module === 'orders') {
+      setOrderView('list');
+      setSelectedOrder(null);
     }
   };
 
@@ -92,6 +103,32 @@ function App() {
     setProductRefreshTrigger(prev => prev + 1);
   };
 
+  // Order handlers (master-detail)
+  const handleAddNewOrder = () => {
+    setSelectedOrder(null);
+    setOrderView('form');
+  };
+
+  const handleEditOrder = (order) => {
+    setSelectedOrder(order);
+    setOrderView('form');
+  };
+
+  const handleOrderSaveSuccess = () => {
+    setOrderView('list');
+    setSelectedOrder(null);
+    setOrderRefreshTrigger(prev => prev + 1);
+  };
+
+  const handleOrderCancel = () => {
+    setOrderView('list');
+    setSelectedOrder(null);
+  };
+
+  const handleOrderDeleteSuccess = () => {
+    setOrderRefreshTrigger(prev => prev + 1);
+  };
+
   /**
    * Render the appropriate content based on current module and view
    */
@@ -115,7 +152,7 @@ function App() {
           />
         );
       }
-    } else {
+    } else if (currentModule === 'products') {
       if (productView === 'list') {
         return (
           <ProductList 
@@ -134,6 +171,25 @@ function App() {
           />
         );
       }
+    } else if (currentModule === 'orders') {
+      if (orderView === 'list') {
+        return (
+          <OrderList 
+            onAddNew={handleAddNewOrder}
+            onEdit={handleEditOrder}
+            onDeleteSuccess={handleOrderDeleteSuccess}
+            refreshTrigger={orderRefreshTrigger}
+          />
+        );
+      } else {
+        return (
+          <OrderForm 
+            order={selectedOrder}
+            onSave={handleOrderSaveSuccess}
+            onCancel={handleOrderCancel}
+          />
+        );
+      }
     }
   };
 
@@ -144,7 +200,7 @@ function App() {
         <Container>
           <Navbar.Brand href="#home">
             <i className="bi bi-building me-2"></i>
-            Customer & Product Management System
+            Customer, Product & Order Management System
           </Navbar.Brand>
         </Container>
       </Navbar>
@@ -164,7 +220,7 @@ function App() {
       <footer className="bg-light text-center py-3 mt-5">
         <Container>
           <p className="mb-0 text-muted">
-            &copy; {new Date().getFullYear()} Customer & Product Management System. All rights reserved.
+            &copy; {new Date().getFullYear()} Customer, Product & Order Management System. All rights reserved.
           </p>
         </Container>
       </footer>

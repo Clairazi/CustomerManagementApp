@@ -36,5 +36,10 @@ namespace CustomerManagementAPI.BLL.Services
         /// Export products to Excel
         /// </summary>
         Task<byte[]> ExportProductsToExcelAsync(string? name = null);
+
+        /// <summary>
+        /// Check if a product has any orders (for referential integrity)
+        /// </summary>
+        Task<bool> HasOrdersAsync(int productId);
     }
 }

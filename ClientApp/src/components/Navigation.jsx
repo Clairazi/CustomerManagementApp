@@ -3,7 +3,7 @@ import { Nav, Container } from 'react-bootstrap';
 
 /**
  * Navigation Component
- * Provides navigation between Customers and Products views
+ * Provides navigation between Customers, Products, and Orders views
  */
 function Navigation({ currentModule, onModuleChange }) {
   return (
@@ -19,6 +19,12 @@ function Navigation({ currentModule, onModuleChange }) {
           <Nav.Link eventKey="products">
             <i className="bi bi-box-fill me-2"></i>
             Products
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey="orders">
+            <i className="bi bi-cart-fill me-2"></i>
+            Orders
           </Nav.Link>
         </Nav.Item>
       </Nav>

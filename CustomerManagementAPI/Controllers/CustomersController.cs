@@ -154,11 +154,13 @@ namespace CustomerManagementAPI.Controllers
 
         /// <summary>
         /// DELETE: api/customers/{id} - Delete a customer
+        /// Referential integrity: Returns 400 Bad Request if customer has orders
         /// </summary>
         /// <param name="id">Customer ID</param>
         /// <returns>Success status</returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteCustomer(int id)
@@ -173,6 +175,12 @@ namespace CustomerManagementAPI.Controllers
                 }
 
                 return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Referential integrity violation - customer has orders
+                _logger.LogWarning(ex, $"Cannot delete customer with ID {id} - integrity violation");
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {

@@ -122,12 +122,20 @@ namespace CustomerManagementAPI.BLL.Services
         }
 
         /// <summary>
-        /// Delete a customer
+        /// Delete a customer with referential integrity check.
+        /// Customers cannot be deleted if they have orders.
         /// </summary>
         public async Task<bool> DeleteCustomerAsync(int id)
         {
             try
             {
+                // Check referential integrity - customer cannot be deleted if they have orders
+                var hasOrders = await _customerRepository.HasOrdersAsync(id);
+                if (hasOrders)
+                {
+                    throw new InvalidOperationException($"Cannot delete customer with ID {id}. Customer has existing orders. Please delete the orders first.");
+                }
+
                 var result = await _customerRepository.DeleteCustomerAsync(id);
                 if (result)
                 {
@@ -135,9 +143,29 @@ namespace CustomerManagementAPI.BLL.Services
                 }
                 return result;
             }
+            catch (InvalidOperationException)
+            {
+                throw; // Re-throw integrity violation
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in DeleteCustomerAsync for ID {id}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Check if a customer has any orders (for referential integrity)
+        /// </summary>
+        public async Task<bool> HasOrdersAsync(int customerId)
+        {
+            try
+            {
+                return await _customerRepository.HasOrdersAsync(customerId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error checking orders for customer ID {customerId}");
                 throw;
             }
         }
