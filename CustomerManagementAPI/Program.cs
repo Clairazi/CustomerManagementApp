@@ -114,7 +114,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
 
-// Authentication & Authorization middleware (order matters!)
+// Authentication & Authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 

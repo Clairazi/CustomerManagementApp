@@ -3,11 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CustomerManagementAPI.DAL.Entities
 {
-    /// <summary>
-    /// OrderItem entity representing the detail record in the master-detail relationship.
-    /// Each OrderItem belongs to one Order and references one Product.
-    /// This allows multiple products per order (similar to MS Access master-detail functionality).
-    /// </summary>
     [Table("OrderItems")]
     public class OrderItem
     {
@@ -53,7 +48,7 @@ namespace CustomerManagementAPI.DAL.Entities
         // Navigation Properties
 
         /// <summary>
-        /// Reference to the parent Order (master record)
+        /// Reference to the parent Order
         /// </summary>
         public virtual Order Order { get; set; } = null!;
 

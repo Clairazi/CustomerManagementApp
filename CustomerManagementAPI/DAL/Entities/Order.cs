@@ -3,10 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CustomerManagementAPI.DAL.Entities
 {
-    /// <summary>
-    /// Order entity representing the master record in the master-detail relationship.
-    /// Contains order header information linked to a Customer and contains multiple OrderItems.
-    /// </summary>
     [Table("Orders")]
     public class Order
     {

@@ -163,7 +163,7 @@ namespace CustomerManagementAPI.DAL
                 }
             );
 
-            // Seed initial Order data (sample orders to demonstrate master-detail)
+            // Seed initial Order data
             modelBuilder.Entity<Order>().HasData(
                 new Order
                 {
