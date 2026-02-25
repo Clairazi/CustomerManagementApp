@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Container, Navbar, Nav } from 'react-bootstrap';
+import { Container, Navbar } from 'react-bootstrap';
 import CustomerList from './components/CustomerList';
 import CustomerForm from './components/CustomerForm';
+import ProductList from './components/ProductList';
+import ProductForm from './components/ProductForm';
+import Navigation from './components/Navigation';
 import './App.css';
 
 /**
@@ -9,52 +12,129 @@ import './App.css';
  * Manages the overall application state and navigation
  */
 function App() {
-  const [currentView, setCurrentView] = useState('list');
+  // Module navigation state (customers or products)
+  const [currentModule, setCurrentModule] = useState('customers');
+  
+  // Customer state management
+  const [customerView, setCustomerView] = useState('list');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [customerRefreshTrigger, setCustomerRefreshTrigger] = useState(0);
+
+  // Product state management
+  const [productView, setProductView] = useState('list');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [productRefreshTrigger, setProductRefreshTrigger] = useState(0);
 
   /**
-   * Handle switching to add new customer view
+   * Handle module change (customers/products)
    */
-  const handleAddNew = () => {
-    setSelectedCustomer(null);
-    setCurrentView('form');
+  const handleModuleChange = (module) => {
+    setCurrentModule(module);
+    // Reset views when switching modules
+    if (module === 'customers') {
+      setCustomerView('list');
+      setSelectedCustomer(null);
+    } else {
+      setProductView('list');
+      setSelectedProduct(null);
+    }
   };
 
-  /**
-   * Handle switching to edit customer view
-   * @param {Object} customer - Customer to edit
-   */
-  const handleEdit = (customer) => {
+  // Customer handlers
+  const handleAddNewCustomer = () => {
+    setSelectedCustomer(null);
+    setCustomerView('form');
+  };
+
+  const handleEditCustomer = (customer) => {
     setSelectedCustomer(customer);
-    setCurrentView('form');
+    setCustomerView('form');
   };
 
-  /**
-   * Handle successful save operation
-   * Refresh the list and return to list view
-   */
-  const handleSaveSuccess = () => {
-    setCurrentView('list');
+  const handleCustomerSaveSuccess = () => {
+    setCustomerView('list');
     setSelectedCustomer(null);
-    setRefreshTrigger(prev => prev + 1);
+    setCustomerRefreshTrigger(prev => prev + 1);
   };
 
-  /**
-   * Handle cancel operation
-   * Return to list view without saving
-   */
-  const handleCancel = () => {
-    setCurrentView('list');
+  const handleCustomerCancel = () => {
+    setCustomerView('list');
     setSelectedCustomer(null);
   };
 
+  const handleCustomerDeleteSuccess = () => {
+    setCustomerRefreshTrigger(prev => prev + 1);
+  };
+
+  // Product handlers
+  const handleAddNewProduct = () => {
+    setSelectedProduct(null);
+    setProductView('form');
+  };
+
+  const handleEditProduct = (product) => {
+    setSelectedProduct(product);
+    setProductView('form');
+  };
+
+  const handleProductSaveSuccess = () => {
+    setProductView('list');
+    setSelectedProduct(null);
+    setProductRefreshTrigger(prev => prev + 1);
+  };
+
+  const handleProductCancel = () => {
+    setProductView('list');
+    setSelectedProduct(null);
+  };
+
+  const handleProductDeleteSuccess = () => {
+    setProductRefreshTrigger(prev => prev + 1);
+  };
+
   /**
-   * Handle successful delete operation
-   * Refresh the list
+   * Render the appropriate content based on current module and view
    */
-  const handleDeleteSuccess = () => {
-    setRefreshTrigger(prev => prev + 1);
+  const renderContent = () => {
+    if (currentModule === 'customers') {
+      if (customerView === 'list') {
+        return (
+          <CustomerList 
+            onAddNew={handleAddNewCustomer}
+            onEdit={handleEditCustomer}
+            onDeleteSuccess={handleCustomerDeleteSuccess}
+            refreshTrigger={customerRefreshTrigger}
+          />
+        );
+      } else {
+        return (
+          <CustomerForm 
+            customer={selectedCustomer}
+            onSave={handleCustomerSaveSuccess}
+            onCancel={handleCustomerCancel}
+          />
+        );
+      }
+    } else {
+      if (productView === 'list') {
+        return (
+          <ProductList 
+            onAddNew={handleAddNewProduct}
+            onEdit={handleEditProduct}
+            onDeleteSuccess={handleProductDeleteSuccess}
+            refreshTrigger={productRefreshTrigger}
+          />
+        );
+      } else {
+        return (
+          <ProductForm 
+            product={selectedProduct}
+            onSave={handleProductSaveSuccess}
+            onCancel={handleProductCancel}
+          />
+        );
+      }
+    }
   };
 
   return (
@@ -63,43 +143,28 @@ function App() {
       <Navbar bg="primary" variant="dark" expand="lg">
         <Container>
           <Navbar.Brand href="#home">
-            <i className="bi bi-people-fill me-2"></i>
-            Customer Management System
+            <i className="bi bi-building me-2"></i>
+            Customer & Product Management System
           </Navbar.Brand>
-          <Nav className="ms-auto">
-            <Nav.Link 
-              onClick={() => setCurrentView('list')} 
-              active={currentView === 'list'}
-            >
-              Customer List
-            </Nav.Link>
-          </Nav>
         </Container>
       </Navbar>
 
+      {/* Module Navigation */}
+      <Navigation 
+        currentModule={currentModule}
+        onModuleChange={handleModuleChange}
+      />
+
       {/* Main Content */}
       <Container className="main-content">
-        {currentView === 'list' ? (
-          <CustomerList 
-            onAddNew={handleAddNew}
-            onEdit={handleEdit}
-            onDeleteSuccess={handleDeleteSuccess}
-            refreshTrigger={refreshTrigger}
-          />
-        ) : (
-          <CustomerForm 
-            customer={selectedCustomer}
-            onSave={handleSaveSuccess}
-            onCancel={handleCancel}
-          />
-        )}
+        {renderContent()}
       </Container>
 
       {/* Footer */}
       <footer className="bg-light text-center py-3 mt-5">
         <Container>
           <p className="mb-0 text-muted">
-            &copy; {new Date().getFullYear()} Customer Management System. All rights reserved.
+            &copy; {new Date().getFullYear()} Customer & Product Management System. All rights reserved.
           </p>
         </Container>
       </footer>
