@@ -22,7 +22,7 @@ A full-stack web application for managing customers, products, and orders with m
 
 ## 🎯 Overview
 
-This Customer, Product & Order Management System is a full-featured enterprise application. It provides a comprehensive solution for managing customer records, product inventory, and orders with master-detail functionality (similar to MS Access). Navigate easily between Customer, Product, and Order management using the tab-based navigation. The system enforces referential integrity - customers and products cannot be deleted if they have associated orders.
+This Customer, Product & Order Management System is a full-featured enterprise application. It provides a comprehensive solution for managing customer records, product inventory, and orders with master-detail functionality. Navigate easily between Customer, Product, and Order management using the tab-based navigation. The system enforces referential integrity - customers and products cannot be deleted if they have associated orders.
 
 ## ✨ Features
 
@@ -40,7 +40,7 @@ This Customer, Product & Order Management System is a full-featured enterprise a
 
 ### Order Management (Master-Detail)
 - **CRUD Operations**: Create, Read, Update, and Delete orders with line items
-- **Master-Detail Form**: Order header with dynamic order items (like MS Access)
+- **Master-Detail Form**: Order header with dynamic order items
 - **Search & Filtering**: Filter orders by Order ID, Date Range, and Customer
 - **Automatic Calculations**: Subtotals and total amounts calculated automatically
 - **Status Tracking**: Track order status (Pending, Processing, Completed, Cancelled)
