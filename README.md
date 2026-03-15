@@ -134,11 +134,6 @@ The application follows a **Three-Tier Architecture**:
      }
    }
    ```
-   
-   **Common connection strings:**
-   - Local SQL Server: `Server=localhost;Database=CustomerManagementDB;Trusted_Connection=True;TrustServerCertificate=True;`
-   - SQL Server Express: `Server=.\SQLEXPRESS;Database=CustomerManagementDB;Trusted_Connection=True;TrustServerCertificate=True;`
-   - SQL Server with credentials: `Server=localhost;Database=CustomerManagementDB;User Id=sa;Password=YourPassword;TrustServerCertificate=True;`
 
 3. **Create Database and Run Migrations**
    
@@ -154,11 +149,6 @@ The application follows a **Three-Tier Architecture**:
    # Create database and apply migrations
    dotnet ef database update
    ```
-   
-   This will:
-   - Create the `CustomerManagementDB` database
-   - Create the `Customers`, `Products`, `Orders`, and `OrderItems` tables
-   - Seed initial sample data (2 customers, 2 products, 2 sample orders)
 
 ### Backend Setup
 
@@ -183,8 +173,6 @@ The application follows a **Three-Tier Architecture**:
    ```
    
    The API will start on:
-   - HTTP: `http://localhost:5000`
-   - HTTPS: `https://localhost:5001`
    - Swagger UI: `http://localhost:5000/swagger`
 
 ### Frontend Setup
