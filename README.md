@@ -209,6 +209,3 @@ The application follows a **Three-Tier Architecture**:
 4. **Open your browser**
    
    Navigate to `http://localhost:3000` to access the application.
-## 👨‍💻 Support
-
-For issues or questions, please check the troubleshooting section above or consult the code comments for detailed explanations.
