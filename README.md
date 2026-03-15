@@ -2,11 +2,7 @@
 
 A full-stack web application for managing customers, products, and orders with master-detail functionality, built with ASP.NET Core Web API and React. Features JWT-based authentication and role protection.
 
-## 🎯 Overview
-
-This Customer, Product & Order Management System is a full-featured enterprise application. It provides a comprehensive solution for managing customer records, product inventory, and orders with master-detail functionality. Navigate easily between Customer, Product, and Order management using the tab-based navigation. The system enforces referential integrity - customers and products cannot be deleted if they have associated orders.
-
-## 🔐 Authentication
+## Authentication
 
 ### Overview
 The application uses JWT (JSON Web Token) based authentication. All API endpoints (except login and register) require a valid JWT token.
@@ -26,7 +22,7 @@ The application uses JWT (JSON Web Token) based authentication. All API endpoint
 - **UI Library**: React Bootstrap 2.9 + Bootstrap 5.3
 - **HTTP Client**: Axios 1.6
 
-## 📦 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following installed:
 
@@ -48,7 +44,7 @@ node --version
 npm --version
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 The application follows a **Three-Tier Architecture**:
 
