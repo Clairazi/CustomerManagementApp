@@ -7,21 +7,6 @@ A full-stack web application for managing customers, products, and orders with m
 ### Overview
 The application uses JWT (JSON Web Token) based authentication. All API endpoints (except login and register) require a valid JWT token.
 
-## 🛠️ Technology Stack
-
-### Backend
-- **Framework**: ASP.NET Core 8.0 Web API
-- **ORM**: Entity Framework Core 8.0
-- **Database**: SQL Server / SQL Server Express
-- **Excel Export**: EPPlus 7.0
-- **API Documentation**: Swagger/OpenAPI
-
-### Frontend
-- **Framework**: React 18.2
-- **Build Tool**: Vite
-- **UI Library**: React Bootstrap 2.9 + Bootstrap 5.3
-- **HTTP Client**: Axios 1.6
-
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
@@ -78,7 +63,7 @@ The application follows a **Three-Tier Architecture**:
   - `OrdersController`
 - **Middleware**: CORS, Error Handling, Swagger
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Database Setup
 
