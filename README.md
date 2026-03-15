@@ -14,7 +14,7 @@ Before you begin, ensure you have the following installed:
 - **.NET SDK 8.0 or later**: [Download](https://dotnet.microsoft.com/download)
 - **Node.js 18.x or later**: [Download](https://nodejs.org/)
 - **SQL Server 2019 or later** (or SQL Server Express): [Download](https://www.microsoft.com/en-us/sql-server/sql-server-downloads)
-- **Visual Studio Code** or **Visual Studio 2022** (recommended)
+- **Visual Studio Code** or **Visual Studio 2022**
 
 ### Verify Installation
 
