@@ -6,39 +6,6 @@ A full-stack web application for managing customers, products, and orders with m
 
 This Customer, Product & Order Management System is a full-featured enterprise application. It provides a comprehensive solution for managing customer records, product inventory, and orders with master-detail functionality. Navigate easily between Customer, Product, and Order management using the tab-based navigation. The system enforces referential integrity - customers and products cannot be deleted if they have associated orders.
 
-## ✨ Features
-
-### Customer Management
-- **CRUD Operations**: Create, Read, Update, and Delete customer records
-- **Advanced Search & Filtering**: Filter customers by first name, last name, email, and phone number
-- **Excel Export**: Export customer data to Excel with applied filters
-- **Form Validation**: Client-side and server-side validation for data integrity
-
-### Product Management
-- **CRUD Operations**: Create, Read, Update, and Delete product records
-- **Search & Filtering**: Filter products by name
-- **Excel Export**: Export product data to Excel with applied filters
-- **Form Validation**: Product name is required, with validation for all fields
-
-### Order Management (Master-Detail)
-- **CRUD Operations**: Create, Read, Update, and Delete orders with line items
-- **Master-Detail Form**: Order header with dynamic order items
-- **Search & Filtering**: Filter orders by Order ID, Date Range, and Customer
-- **Automatic Calculations**: Subtotals and total amounts calculated automatically
-- **Status Tracking**: Track order status (Pending, Processing, Completed, Cancelled)
-
-### Referential Integrity
-- **Customer Protection**: Customers cannot be deleted if they have orders
-- **Product Protection**: Products cannot be deleted if they are used in orders
-- **Cascade Delete**: Deleting an order automatically removes its order items
-
-### General Features
-- **Navigation**: Tab-based navigation to switch between Customers, Products, and Orders views
-- **Responsive Design**: Modern UI built with React and Bootstrap
-- **REST API**: Well-documented API endpoints following REST principles
-- **Three-Tier Architecture**: Separation of concerns with DAL, BLL, and Presentation layers
-- **Data Validation**: Client-side and server-side validation for data integrity
-
 ## 🔐 Authentication
 
 ### Overview
