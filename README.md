@@ -40,10 +40,6 @@ The application follows a **Three-Tier Architecture**:
   - `ICustomerRepository` / `CustomerRepository`
   - `IProductRepository` / `ProductRepository`
   - `IOrderRepository` / `OrderRepository`
-- **Relationships**:
-  - Order → Customer (Many-to-One, Restrict Delete)
-  - Order → OrderItems (One-to-Many, Cascade Delete)
-  - OrderItem → Product (Many-to-One, Restrict Delete)
 
 ### 2. Business Logic Layer (BLL)
 - **Services**: Business logic and validation
