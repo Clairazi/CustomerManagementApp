@@ -2,6 +2,18 @@
 
 A full-stack web application for managing customers, products, and orders with master-detail functionality, built with ASP.NET Core Web API and React. Features JWT-based authentication and role protection.
 
+
+## Technology Stack
+### Backend:
+•	Framework: ASP.NET Core 8.0 Web API
+•	ORM: Entity Framework Core 8.0
+•	Database: SQL Server
+### Frontend
+•	Framework: React 18.2
+•	Build Tool: Vite
+•	UI Library: React Bootstrap 2.9 + Bootstrap 5.3
+•	HTTP Client: Axios 1.6
+
 ## Authentication
 
 ### Overview
